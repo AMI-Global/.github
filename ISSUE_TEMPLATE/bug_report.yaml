@@ -78,17 +78,5 @@ body:
     validations:
       required: false
 
-  - type: dropdown
-    id: label_selector
-    attributes:
-      label: Label
-      description: This will automatically label the issue.
-      options:
-        - bug
-        - security
-        - other
-    validations:
-      required: true
-
 labels:
-  - "${{ inputs.label_selector }}"
+  - bug
