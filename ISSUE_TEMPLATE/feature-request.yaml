@@ -1,0 +1,78 @@
+name: Feature Request
+description: Suggest a new feature or improvement.
+title: "[FEATURE]: "
+labels: []
+assignees: []
+body:
+  - type: dropdown
+    id: issue_type
+    attributes:
+      label: Issue Type
+      description: What kind of request is this?
+      options:
+        - Feature Request
+        - Security
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Describe the feature or improvement you're suggesting.
+      placeholder: What should this feature do?
+    validations:
+      required: true
+
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Problem / Use Case
+      description: What problem does this solve or what’s the user benefit?
+      placeholder: Describe the scenario or need this addresses.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed Solution or Ideas
+      description: Share any ideas or details for how the feature could work.
+      placeholder: UI sketches, user stories, examples, etc.
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: What conditions must be met for this to be considered complete?
+      placeholder: |
+        - [ ] User can export data to CSV
+        - [ ] The button appears only if user has write access
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional_context
+    attributes:
+      label: Additional Context
+      description: Any other relevant info, links, or references.
+    validations:
+      required: false
+
+  - type: dropdown
+    id: label_selector
+    attributes:
+      label: Label
+      description: This will automatically label the issue.
+      options:
+        - enhancement
+        - security
+        - other
+    validations:
+      required: true
+
+labels:
+  - "${{ inputs.label_selector }}"
