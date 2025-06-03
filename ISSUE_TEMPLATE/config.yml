@@ -1,6 +1,6 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 🆕 New Feature? - see WIKI for how to create proper AMI feature requests.
+  - name: 🆕 New Feature? - see [WIKI](https://github.com/AMI-Global/AMI.Docs/wiki) for how to create proper AMI feature requests.
     url: https://github.com/AMI-Global/AMI.Docs/wiki/guide.new_feature_issue
     about: Ask Stig, Ronen or Mikkel for any clarifications needed.
   - name: 🐛 Bug Reports - see WIKI for how to create proper AMI bug reports.

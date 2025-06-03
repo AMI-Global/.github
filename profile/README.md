@@ -1,4 +1,1 @@
 # AMI Global 
-
-## 📞 Support
-
