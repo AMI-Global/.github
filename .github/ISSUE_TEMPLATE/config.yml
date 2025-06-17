@@ -1,11 +1,8 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 🆕 New Feature? - see [WIKI](https://github.com/AMI-Global/AMI.Docs/wiki) for how to create proper AMI feature requests.
-    url: https://github.com/AMI-Global/AMI.Docs/wiki/guide.new_feature_issue
+  - name: 🆕 New Feature? - see [the how-to in our WIKI](https://github.com/AMI-Global/AMI.Docs/wiki/How%20to%20create%20a%20new%20feature%20request)
+    url: https://github.com/AMI-Global/AMI.Docs/wiki/How%20to%20create%20a%20new%20feature%20request
     about: Ask Stig, Ronen or Mikkel for any clarifications needed.
-  - name: 🐛 Bug Reports - see WIKI for how to create proper AMI bug reports.
-    url: https://github.com/AMI-Global/AMI.Docs/wiki/guide.new_bugreport_issue
-    about: Ask Stig, Ronen or Mikkel for any clarifications needed.
-  - name: 📋 Workflow - see WIKI for how comply with AMI's workflow procedures.
-    url: https://github.com/AMI-Global/AMI.Docs/wiki/guide.workflows
+  - name: 🐛 Bug Reports - see [the how-to in our WIKI](https://github.com/AMI-Global/AMI.Docs/wiki/How%20to%20create%20a%20new%20bug%20report)
+    url: https://github.com/AMI-Global/AMI.Docs/wiki/How%20to%20create%20a%20new%20feature%20request
     about: Ask Stig, Ronen or Mikkel for any clarifications needed.

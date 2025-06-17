@@ -1,0 +1,48 @@
+name: Feature Request
+description: Request a new feature or enhancement
+title: ""
+labels: [feature]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: What should this feature do and why is it needed?
+      placeholder: Clearly describe the proposed feature and its business value...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know when this feature is complete?
+      value: |
+        - [ ] ... 
+        - [ ] ...
+        - [ ] ...
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - Not Decided
+        - Low
+        - Medium
+        - High
+        - Critical
+      default: 0
+    validations:
+      required: true
+  - type: textarea
+    id: security_assessment
+    attributes:
+      label: Security Assessment
+      description: Are there any security implications to be aware of?
+      placeholder: Describe any security considerations or enter 'None identified'
+    validations:
+      required: true
+

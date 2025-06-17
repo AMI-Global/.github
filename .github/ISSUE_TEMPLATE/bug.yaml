@@ -1,0 +1,84 @@
+name: Bug Report
+description: Report a bug or unexpected behavior
+title: ""
+labels: [bug]
+body:
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this issue?
+      options:
+        - Not Decided
+        - Low
+        - Medium
+        - High
+        - Critical
+      default: 0
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: security_flags
+    attributes:
+      label: Security Assessment
+      description: Check any security concerns (leave all unchecked if none apply)
+      options:
+        - label: Potential SQL injection vulnerability
+        - label: Cross-Site Scripting (XSS) risk
+        - label: Access control/authorization issue
+        - label: Other security implications (explain below)
+
+  - type: textarea
+    id: observed
+    attributes:
+      label: Observed Behavior
+      description: What actually happened? Include security details if flagged above.
+      placeholder: Describe what you observed...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+      placeholder: Describe what you expected...
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: How to Reproduce
+      description: Clear steps to reproduce this issue
+      placeholder: |
+        For example:
+        1. Go to...
+        2. Click on...
+        3. Observe...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: system
+    attributes:
+      label: System Environment
+      description: Where was this observed?
+      options:
+        - n.a.
+        - Development
+        - QA
+        - Staging
+        - Production
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Software Version
+      description: Provide version number or enter 'unknown'
+      placeholder: v2.1.3, commit@abc123, or 'unknown'
+    validations:
+      required: true
