@@ -90,3 +90,21 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: internal_testing_report
+    attributes:
+      label: Internal Testing Report
+      description: Describe the results of internal testing on QA.
+      placeholder: Describe results of internal testing on QA
+    validations:
+      required: false
+
+  - type: textarea
+    id: customer_testing_report
+    attributes:
+      label: Customer Testing Report
+      description: Describe the results of customer testing on Staging.
+      placeholder: Describe results of customer testing on Staging.
+    validations:
+      required: false
+
