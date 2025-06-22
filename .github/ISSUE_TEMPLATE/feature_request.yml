@@ -16,12 +16,10 @@ body:
     attributes:
       label: Acceptance Criteria
       description: How will we know when this feature is complete?
-      value: |
-        - [ ] ... 
-        - [ ] ...
-        - [ ] ...
+      placeholder: List one or more test or criterias to determine when the feature is complete
     validations:
       required: true
+  
   - type: dropdown
     id: priority
     attributes:
@@ -32,16 +30,27 @@ body:
         - Low
         - Medium
         - High
-        - Critical
       default: 0
     validations:
       required: true
+
+  - type: checkboxes
+    id: security_flags
+    attributes:
+      label: Security Assessment in Planning phase
+      description: Check any security concerns (leave all unchecked if none apply)
+      options:
+        - label: Potential SQL injection vulnerability
+        - label: Cross-Site Scripting (XSS) risk
+        - label: Access control/authorization issue
+        - label: Other security implications (explain below)
+
   - type: textarea
     id: security_assessment
     attributes:
-      label: Security Assessment
+      label: Security Assessment in Planning phase
       description: Are there any security implications to be aware of?
-      placeholder: Describe any security considerations or enter 'None identified'
+      placeholder: Describe any security considerations or enter 'None identified', 'Dont know', or 'Unknown'.
     validations:
       required: true
 
