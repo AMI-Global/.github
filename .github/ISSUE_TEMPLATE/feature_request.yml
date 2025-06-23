@@ -2,10 +2,22 @@ name: Feature Request
 description: Request a new feature or enhancement
 labels: [feature]
 body:
+
+  - type: checkboxes
+    id: repository-selection
+    attributes:
+      label: ⚠️Repository Selection Reminder
+      description: Verify you have selected the correct repository before proceeding
+      options:
+        - label: "**I have verified this issue is being created in the CORRECT repository** the repository dropdown selection above**"
+          required: true
+    validations:
+      required: true
+
   - type: textarea
     id: description
     attributes:
-      label: Feature Description
+      label: 📝Feature Description
       description: What should this feature do and why is it needed?
       placeholder: Clearly describe the proposed feature and its business value...
     validations:
@@ -14,7 +26,7 @@ body:
   - type: textarea
     id: acceptance_criteria
     attributes:
-      label: Acceptance Criteria
+      label: ✅Acceptance Criteria
       description: How will we know when this feature is complete?
       placeholder: List one or more test or criterias to determine when the feature is complete
     validations:
@@ -23,13 +35,13 @@ body:
   - type: dropdown
     id: priority
     attributes:
-      label: Priority
+      label: 🎯Priority
       description: How important is this feature?
       options:
         - Not Decided
         - Low
         - Medium
-        - High
+        - High  
       default: 0
     validations:
       required: true
@@ -37,7 +49,7 @@ body:
   - type: checkboxes
     id: security_flags
     attributes:
-      label: Security Assessment in Planning phase
+      label: 🛡️Security Assessment in Planning phase
       description: Check any security concerns (leave all unchecked if none apply)
       options:
         - label: Potential SQL injection vulnerability
@@ -48,7 +60,7 @@ body:
   - type: textarea
     id: security_assessment
     attributes:
-      label: Security Assessment in Planning phase
+      label: 🛡️Security Assessment in Planning phase
       description: Are there any security implications to be aware of?
       placeholder: Describe any security considerations or enter 'None identified', 'Dont know', or 'Unknown'.
     validations:
@@ -57,7 +69,7 @@ body:
   - type: textarea
     id: internal_testing_report
     attributes:
-      label: Internal Testing Report
+      label: 🧪Internal Testing Report
       description: Describe the results of internal testing on QA.
       placeholder: Describe results of internal testing on QA
     validations:
@@ -66,7 +78,7 @@ body:
   - type: textarea
     id: customer_testing_report
     attributes:
-      label: Customer Testing Report
+      label: 🚦Customer Testing Report
       description: Describe the results of customer testing on Staging.
       placeholder: Describe results of customer testing on Staging.
     validations:
