@@ -2,11 +2,26 @@ name: Bug Report
 description: Report a bug or unexpected behavior
 labels: [bug]
 body:
+  - type: textarea
+    id: observed
+    attributes:
+      label: Description
+      description: What did you do and/or observe?
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should have happened?
+    validations:
+      required: true
 
   - type: checkboxes
     id: repository-selection
     attributes:
-      label: ⚠️Repository Selection Reminder
+      label: Repository Selection Reminder
       description: Verify you have selected the correct repository before proceeding
       options:
         - label: "**I have verified this issue is being created in the CORRECT repository** the repository dropdown selection above**"
@@ -17,7 +32,7 @@ body:
   - type: dropdown
     id: priority
     attributes:
-      label: 🎯Priority
+      label: Priority
       description: How urgent is this issue?
       options:
         - Not Decided
@@ -30,27 +45,9 @@ body:
       required: true
 
   - type: textarea
-    id: observed
-    attributes:
-      label: 🙊Observed Behavior
-      description: What actually happened?
-      placeholder: Describe what you observed...
-    validations:
-      required: true
-
-  - type: textarea
-    id: expected
-    attributes:
-      label: 🔮Expected Behavior
-      description: What should have happened?
-      placeholder: Describe what you expected...
-    validations:
-      required: true
-
-  - type: textarea
     id: reproduce
     attributes:
-      label: 🔢How to Reproduce - step by step please.
+      label: How to Reproduce - step by step please.
       description: Clear steps to reproduce this issue
       placeholder: |
         For example:
@@ -63,7 +60,7 @@ body:
   - type: dropdown
     id: system
     attributes:
-      label: 🖥️/☁️ System Environment
+      label: System Environment
       description: Where was this observed?
       options:
         - n.a.
@@ -76,7 +73,7 @@ body:
   - type: input
     id: version
     attributes:
-      label: 🏷️Software Version
+      label: Software Version
       description: Provide version number or enter 'unknown'
       placeholder: v2.1.3, commit@abc123, or 'unknown'
     validations:
@@ -85,7 +82,7 @@ body:
   - type: checkboxes
     id: security_flags
     attributes:
-      label: 🛡️Security Assessment in Planning phase
+      label: Security Assessment in Planning phase
       description: Check any security concerns (leave all unchecked if none apply)
       options:
         - label: Potential SQL injection vulnerability
@@ -96,16 +93,16 @@ body:
   - type: textarea
     id: security_assessment
     attributes:
-      label: 🛡️Security Assessment in Planning phase
+      label: Security Assessment in Planning phase
       description: Are there any security implications to be aware of?
       placeholder: Describe any security considerations or enter 'None identified', 'Dont know', or 'Unknown'.
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: internal_testing_report
     attributes:
-      label: 🧪Internal Testing Report
+      label: Internal Testing Report
       description: Describe the results of internal testing on QA.
       placeholder: Describe results of internal testing on QA
     validations:
@@ -114,9 +111,8 @@ body:
   - type: textarea
     id: customer_testing_report
     attributes:
-      label: 🚦Customer Testing Report
+      label: Customer Testing Report
       description: Describe the results of customer testing on Staging.
       placeholder: Describe results of customer testing on Staging.
     validations:
       required: false
-
