@@ -16,6 +16,7 @@ body:
       label: Acceptance Criteria
       description: |
        What tests should be satisfied for an acceptable implementation?
+       
        Concrete examples are VERY helpful for early testing during implementation!
     validations:
       required: true
