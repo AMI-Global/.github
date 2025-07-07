@@ -6,19 +6,7 @@ body:
     id: description
     attributes:
       label: Feature Description
-      description: What should this feature do and why is it needed?
-      placeholder: Clearly describe the proposed feature and its business value...
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: repository-selection
-    attributes:
-      label: Repository Selection Reminder
-      description: Verify you have selected the correct repository before proceeding
-      options:
-        - label: "**I have verified this issue is being created in the CORRECT repository** the repository dropdown selection above**"
-          required: true
+      placeholder: Describe the proposed feature...
     validations:
       required: true
 
@@ -26,8 +14,10 @@ body:
     id: acceptance_criteria
     attributes:
       label: Acceptance Criteria
-      description: How will we know when this feature is complete?
-      placeholder: List one or more test or criterias to determine when the feature is complete
+      placeholder: |
+       How will developer know when this feature is complete?
+       What tests can be made?
+       Examples of input and output data?
     validations:
       required: true
   
@@ -42,6 +32,17 @@ body:
         - Medium
         - High  
       default: 0
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: repository-selection
+    attributes:
+      label: Repository Selection Reminder
+      description: Verify you have selected the correct repository before proceeding
+      options:
+        - label: "**I have verified this issue is being created in the CORRECT repository** the repository dropdown selection above**"
+          required: true
     validations:
       required: true
 
