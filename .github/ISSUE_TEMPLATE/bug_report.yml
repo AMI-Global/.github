@@ -19,7 +19,7 @@ body:
       required: true
 
   - type: textarea
-    id: expected
+    id: reproduce
     attributes:
       label: How to reproduce
       description: Step by step guide to reproduce bug
