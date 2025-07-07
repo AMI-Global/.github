@@ -1,0 +1,14 @@
+name: Configure new issue
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  add-to-project:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add issue to project
+        uses: actions/add-to-project@v0.5.0
+        with:
+          project-url: https://github.com/orgs/AMI-Global/projects/26
+          github-token: ${{ secrets.SDLC_Automation_Token }}
