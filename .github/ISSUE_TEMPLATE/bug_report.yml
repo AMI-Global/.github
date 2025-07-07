@@ -6,10 +6,7 @@ body:
     id: observed
     attributes:
       label: Description
-      placeholder: |
-        Describe the bug...
-        **Describe step by step how to reproduce the bug:**
-        ...
+      placeholder: What is the bug?
     validations:
       required: true
 
@@ -21,11 +18,19 @@ body:
     validations:
       required: true
 
+  - type: textarea
+    id: expected
+    attributes:
+      label: How to reproduce
+      description: Step by step guide to reproduce bug
+    validations:
+      required: true
+
   - type: dropdown
     id: priority
     attributes:
       label: Priority
-      description: How urgent is this issue?
+      description: How urgent is this bug?
       options:
         - Not Decided
         - Low
@@ -48,7 +53,7 @@ body:
         - label: Production
     validations:
       required: false
-      
+
   - type: input
     id: version
     attributes:

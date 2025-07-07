@@ -6,7 +6,7 @@ body:
     id: description
     attributes:
       label: Feature Description
-      placeholder: Describe the proposed feature...
+      description: Describe the proposed feature...
     validations:
       required: true
 
@@ -14,10 +14,9 @@ body:
     id: acceptance_criteria
     attributes:
       label: Acceptance Criteria
-      placeholder: |
-       How will developer know when this feature is complete?
-       What tests can be made?
-       Examples of input and output data?
+      description: |
+       What tests should be satisfied for an acceptable implementation?
+       Concrete examples are VERY helpful for early testing during implementation!
     validations:
       required: true
   
