@@ -19,7 +19,7 @@ body:
        
        Concrete examples are VERY helpful for early testing during implementation!
     validations:
-      required: true
+      required: false
   
   - type: dropdown
     id: priority
@@ -30,57 +30,8 @@ body:
         - Not Decided
         - Low
         - Medium
-        - High  
+        - High
+        - Critical
       default: 0
     validations:
       required: false
-
-  - type: checkboxes
-    id: repository-selection
-    attributes:
-      label: Repository Selection Reminder
-      description: Verify you have selected the correct repository before proceeding
-      options:
-        - label: "**I have verified this issue is being created in the CORRECT repository** the repository dropdown selection above**"
-          required: true
-    validations:
-      required: true
-
-  - type: checkboxes
-    id: security_flags
-    attributes:
-      label: Security Assessment in Planning phase
-      description: Check any security concerns (leave all unchecked if none apply)
-      options:
-        - label: Potential SQL injection vulnerability
-        - label: Cross-Site Scripting (XSS) risk
-        - label: Access control/authorization issue
-        - label: Other security implications (explain below)
-
-  - type: textarea
-    id: security_assessment
-    attributes:
-      label: Security Assessment in Planning phase
-      description: Are there any security implications to be aware of?
-      placeholder: Describe any security considerations or enter 'None identified', 'Dont know', or 'Unknown'.
-    validations:
-      required: false
-
-  - type: textarea
-    id: internal_testing_report
-    attributes:
-      label: Internal Testing Report
-      description: Describe the results of internal testing on QA.
-      placeholder: Describe results of internal testing on QA
-    validations:
-      required: false
-
-  - type: textarea
-    id: customer_testing_report
-    attributes:
-      label: Customer Testing Report
-      description: Describe the results of customer testing on Staging.
-      placeholder: Describe results of customer testing on Staging.
-    validations:
-      required: false
-

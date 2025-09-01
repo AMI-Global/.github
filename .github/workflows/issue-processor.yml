@@ -1,0 +1,555 @@
+name: Issue Template Post-Processing
+on:
+  issues:
+    types: [opened, reopened]
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  process-issue:
+    runs-on: ubuntu-latest
+    # Only process issues created by real users, not bots
+    if: github.event.issue.user.type == 'User'
+    steps:
+      - name: Generate GitHub App Token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID_AMI_PROJECT_AUTOMATION }}
+          private-key: ${{ secrets.ISSUE_AUTOMATION }}
+          owner: AMI-Global
+      # ADD THIS DEBUG STEP
+      - name: Debug App Token Access
+        run: |
+          echo "Testing App token access..."
+          
+          # Test basic API access
+          curl -s -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
+               -H "Accept: application/vnd.github.v3+json" \
+               https://api.github.com/user
+          
+          echo "---"
+          
+          # Test GraphQL access and app identity
+          curl -s -X POST \
+               -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
+               -H "Content-Type: application/json" \
+               -d '{"query":"query { viewer { __typename login } }"}' \
+               https://api.github.com/graphql
+          
+          echo "---"
+          
+          # Test project access specifically
+          curl -s -X POST \
+               -H "Authorization: Bearer ${{ steps.generate_token.outputs.token }}" \
+               -H "Content-Type: application/json" \
+               -d '{"query":"query { organization(login: \"AMI-Global\") { projectsV2(first: 5) { nodes { id title } } } }"}' \
+               https://api.github.com/graphql
+      - name: Process Issue Template 
+        uses: actions/github-script@v7
+        env:
+          # Make App token available for project updates
+          APP_TOKEN: ${{ steps.generate_token.outputs.token }}
+        with:
+          # Use GITHUB_TOKEN to prevent sub-issues from triggering workflows
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            /**
+             * GitHub Issue Template Post-Processing with Corrected Project Updates
+             * Uses fetch() for GraphQL operations to bypass github-script client issues
+             * COMPLETE CORRECTED VERSION
+             */
+            
+            // Configuration for AMI-Global Project 26
+            const CONFIG = {
+              PROJECT_ID: 'PVT_kwDOBMIbcM4A7rn1',
+              PRIORITY_FIELD_ID: 'PVTSSF_lADOBMIbcM4A7rn1zgxDUe8',
+              STATUS_FIELD_ID: 'PVTSSF_lADOBMIbcM4A7rn1zgv6DF0'
+            };
+            
+            /**
+             * Main entry point with corrected token usage
+             */
+            async function processIssue({ github, context, core }) {
+              const { owner, repo } = context.repo;
+              const issue = context.payload.issue;
+              const author = issue.user.login;
+            
+              console.log(`Processing issue #${issue.number}: ${issue.title}`);
+            
+              const templateData = parseTemplateData(issue.body);
+            
+              if (!isValidTemplate(templateData)) {
+                // Use GITHUB_TOKEN for issue operations
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: issue.number,
+                  body: createMissingTemplateMessage(author, owner, repo)
+                });
+                await github.rest.issues.addLabels({
+                  owner, repo, issue_number: issue.number,
+                  labels: ['missing-template-structure', 'needs-attention']
+                });
+                return;
+              }
+            
+              try {
+                // 1. Update issue body using GITHUB_TOKEN (default github client)
+                const newBody = rewriteIssueBody(templateData);
+                await github.rest.issues.update({
+                  owner, repo, issue_number: issue.number, body: newBody
+                });
+            
+                // 2. Use App token for project operations (corrected approach)
+                await updateProjectFields(github, templateData, issue);
+            
+                // 3. Use default GITHUB_TOKEN client for sub-issues (prevents workflow triggers)
+                await createSubIssues(github, { owner, repo }, issue, templateData);
+            
+                console.log('✅ Issue processing completed successfully');
+            
+              } catch (error) {
+                console.error('❌ Error processing issue:', error);
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: issue.number,
+                  body: createProcessingFailedMessage(author, error.message)
+                });
+                throw error;
+              }
+            }
+            
+            /**
+             * CORRECTED: Updates GitHub Project fields using fetch() for GraphQL
+             */
+            async function updateProjectFields(github, templateData, issue) {
+              try {
+                console.log(`🔄 Adding issue #${issue.number} to project using App token...`);
+            
+                // Get the app token from environment
+                const appToken = process.env.APP_TOKEN;
+                if (!appToken) {
+                  throw new Error('APP_TOKEN environment variable not found');
+                }
+            
+                console.log('App token available:', appToken ? 'Yes' : 'No');
+                console.log('App token length:', appToken?.length);
+            
+                // Create raw fetch function for GraphQL with proper headers
+                async function graphqlWithAppToken(query, variables = {}) {
+                  const response = await fetch('https://api.github.com/graphql', {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${appToken}`,
+                      'Content-Type': 'application/json',
+                      'Accept': 'application/vnd.github.v3+json',
+                      'User-Agent': 'GitHub-Action'
+                    },
+                    body: JSON.stringify({ query, variables })
+                  });
+            
+                  if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`GraphQL request failed: ${response.status} ${response.statusText} - ${errorText}`);
+                  }
+            
+                  const result = await response.json();
+            
+                  if (result.errors && result.errors.length > 0) {
+                    console.error('GraphQL errors:', JSON.stringify(result.errors, null, 2));
+                    throw new Error(`GraphQL errors: ${result.errors.map(e => e.message).join(', ')}`);
+                  }
+            
+                  return result.data;
+                }
+            
+                // Test the GraphQL connection first
+                console.log('🔍 Testing GraphQL connection...');
+                const testResult = await graphqlWithAppToken(`
+                  query { 
+                    viewer { __typename login }
+                  }
+                `);
+                console.log('✅ GraphQL test passed. App identity:', testResult.viewer.login);
+            
+                // Test project access
+                console.log('🔍 Testing project access...');
+                const projectTestResult = await graphqlWithAppToken(`
+                  query($projectId: ID!) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        id
+                        title
+                      }
+                    }
+                  }
+                `, { projectId: CONFIG.PROJECT_ID });
+            
+                if (projectTestResult.node) {
+                  console.log('✅ Project accessible:', projectTestResult.node.title);
+                } else {
+                  throw new Error('Project not found or not accessible');
+                }
+            
+                // Now add the issue to the project
+                console.log('🔄 Adding issue to project...');
+                const addToProjectQuery = `
+                  mutation($projectId: ID!, $contentId: ID!) {
+                    addProjectV2ItemById(input: {
+                      projectId: $projectId
+                      contentId: $contentId
+                    }) {
+                      item { id }
+                    }
+                  }
+                `;
+            
+                console.log('Project ID:', CONFIG.PROJECT_ID);
+                console.log('Issue node_id:', issue.node_id);
+            
+                const addResult = await graphqlWithAppToken(addToProjectQuery, {
+                  projectId: CONFIG.PROJECT_ID,
+                  contentId: issue.node_id
+                });
+            
+                const itemId = addResult.addProjectV2ItemById.item.id;
+                console.log(`✅ Added issue to project, item ID: ${itemId}`);
+            
+                // Update Priority field if user selected a value
+                if (templateData.priority && templateData.priority !== 'Not Decided') {
+                  await updateProjectFieldWithFetch(graphqlWithAppToken, itemId, CONFIG.PRIORITY_FIELD_ID, templateData.priority);
+                  console.log(`✅ Set Priority to: ${templateData.priority}`);
+                }
+            
+                // Always set Status to "New" for incoming issues
+                await updateProjectFieldWithFetch(graphqlWithAppToken, itemId, CONFIG.STATUS_FIELD_ID, 'New');
+                console.log(`✅ Set Status to: New`);
+            
+                console.log('✅ Project fields updated successfully');
+            
+              } catch (error) {
+                console.error('❌ Error updating project fields:', error);
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+                // Don't throw - project field failures shouldn't stop other processing
+              }
+            }
+            
+            /**
+             * CORRECTED: Updates a single project field using fetch()
+             */
+            async function updateProjectFieldWithFetch(graphqlWithAppToken, itemId, fieldId, value) {
+              try {
+                // Get option ID
+                const optionId = await getFieldOptionIdWithFetch(graphqlWithAppToken, fieldId, value);
+                if (optionId) {
+                  const mutation = `
+                    mutation($projectId: ID!, $itemId: ID!, $fieldId: ID!, $value: ProjectV2FieldValue!) {
+                      updateProjectV2ItemFieldValue(input: {
+                        projectId: $projectId
+                        itemId: $itemId
+                        fieldId: $fieldId
+                        value: $value
+                      }) {
+                        projectV2Item { id }
+                      }
+                    }
+                  `;
+            
+                  await graphqlWithAppToken(mutation, {
+                    projectId: CONFIG.PROJECT_ID,
+                    itemId: itemId,
+                    fieldId: fieldId,
+                    value: { singleSelectOptionId: optionId }
+                  });
+                  console.log(`✅ Updated field ${fieldId} to option: ${value}`);
+                } else {
+                  console.log(`⚠️ Option '${value}' not found for field ${fieldId}`);
+                }
+              } catch (error) {
+                console.error(`❌ Error updating field ${fieldId}:`, error);
+                // Don't throw - field update failures shouldn't stop processing
+              }
+            }
+            
+            /**
+             * CORRECTED: Gets field option ID using fetch()
+             */
+            async function getFieldOptionIdWithFetch(graphqlWithAppToken, fieldId, optionName) {
+              try {
+                const query = `
+                  query($projectId: ID!) {
+                    node(id: $projectId) {
+                      ... on ProjectV2 {
+                        fields(first: 20) {
+                          nodes {
+                            ... on ProjectV2SingleSelectField {
+                              id
+                              options { id name }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                `;
+            
+                const result = await graphqlWithAppToken(query, { projectId: CONFIG.PROJECT_ID });
+            
+                const field = result.node.fields.nodes.find(f => f.id === fieldId);
+                const option = field?.options?.find(opt => opt.name === optionName);
+            
+                return option?.id;
+              } catch (error) {
+                console.error('❌ Error getting field option ID:', error);
+                return null;
+              }
+            }
+            
+            /**
+             * Validates if parsed template data meets minimum requirements
+             */
+            function isValidTemplate(data) {
+              const hasDescription = data.description && data.description.length > 0;
+              const hasTemplateHeaders = data.hasDescriptionHeader;
+              const hasRequiredSections = data.acceptanceCriteria || data.expectedBehavior || data.howToReproduce;
+              const hasPriority = data.priority !== 'Not Decided';
+            
+              console.log('=== DEBUG: Validation checks ===');
+              console.log('hasDescription:', hasDescription, '(length:', data.description?.length, ')');
+              console.log('hasTemplateHeaders:', hasTemplateHeaders);
+              console.log('hasRequiredSections:', hasRequiredSections);
+              console.log('hasPriority:', hasPriority, '(value:', data.priority, ')');
+            
+              const result = hasDescription && (hasTemplateHeaders || hasRequiredSections || hasPriority);
+              console.log('Final validation result:', result);
+            
+              return result;
+            }
+            
+            /**
+             * Parses GitHub issue form template data from issue body
+             */
+            function parseTemplateData(body) {
+              console.log('=== DEBUG: Raw issue body ===');
+              console.log(JSON.stringify(body, null, 2));
+              console.log('=== DEBUG: Body length ===', body.length);
+            
+              // Initialize with defaults to handle missing sections gracefully
+              const data = {
+                description: '',
+                acceptanceCriteria: '',
+                expectedBehavior: '',
+                howToReproduce: '',
+                priority: 'Not Decided',
+                securityAssessment: '',
+                internalTesting: '',
+                customerTesting: '',
+                hasDescriptionHeader: false
+              };
+            
+              // Split by ### headers to extract sections
+              const sections = body.split(/### /);
+              console.log('=== DEBUG: Found sections ===', sections.length);
+            
+              sections.forEach((section, index) => {
+                const lines = section.trim().split('\n');
+                const header = lines[0]?.trim().toLowerCase();
+                const content = lines.slice(1).join('\n').trim();
+            
+                console.log(`=== DEBUG: Section ${index} ===`);
+                console.log('Header:', JSON.stringify(header));
+                console.log('Content length:', content.length);
+                console.log('Content preview:', JSON.stringify(content.substring(0, 100)));
+            
+                // Map template headers to data properties
+                switch (header) {
+                  case 'description':
+                  case 'feature description':
+                    console.log('✅ Matched DESCRIPTION');
+                    data.description = content;
+                    data.hasDescriptionHeader = true;
+                    break;
+                  case 'acceptance criteria':
+                    console.log('✅ Matched ACCEPTANCE CRITERIA');
+                    data.acceptanceCriteria = content;
+                    break;
+                  case 'expected behavior':
+                  case 'expected behaviour':
+                    console.log('✅ Matched EXPECTED BEHAVIOR');
+                    data.expectedBehavior = content;
+                    break;
+                  case 'how to reproduce':
+                    console.log('✅ Matched HOW TO REPRODUCE');
+                    data.howToReproduce = content;
+                    break;
+                  case 'priority':
+                    console.log('✅ Matched PRIORITY');
+                    console.log('Priority raw content:', JSON.stringify(content));
+                    // Extract first line as priority selection
+                    const priorityMatch = content.match(/^(.+?)$/m);
+                    console.log('Priority match result:', priorityMatch);
+                    if (priorityMatch && priorityMatch[1].trim() !== 'Not Decided') {
+                      data.priority = priorityMatch[1].trim();
+                      console.log('Priority set to:', data.priority);
+                    } else {
+                      console.log('Priority remained: Not Decided');
+                    }
+                    break;
+                  // Optional sections from complex templates
+                  case 'security assessment in planning phase':
+                    data.securityAssessment = content;
+                    break;
+                  case 'internal testing report':
+                    data.internalTesting = content;
+                    break;
+                  case 'customer testing report':
+                    data.customerTesting = content;
+                    break;
+                  default:
+                    console.log('❌ No match for header:', header);
+                }
+              });
+              return data;
+            }
+            
+            /**
+             * Rewrites issue body with clean formatting and collapsible sections
+             */
+            function rewriteIssueBody(data) {
+              let newBody = '';
+            
+              // Start with main description (no header - this is the primary content)
+              if (data.description) {
+                newBody += data.description + '\n\n';
+              }
+            
+              // Create collapsible sections for secondary information
+              const collapsibleSections = [
+                { label: 'Acceptance Criteria', content: data.acceptanceCriteria },
+                { label: 'Expected Behavior', content: data.expectedBehavior },
+                { label: 'How to reproduce', content: data.howToReproduce }
+              ];
+            
+              collapsibleSections.forEach(section => {
+                if (section.content) {
+                  newBody += `<details><summary>${section.label}</summary>\n\n${section.content}\n\n</details>\n\n`;
+                }
+              });
+            
+              return newBody.trim();
+            }
+            
+            /**
+             * Creates sub-issues using GITHUB_TOKEN (prevents workflow triggers)
+             */
+            async function createSubIssues(github, repoInfo, issue, templateData) {
+              const { owner, repo } = repoInfo;
+              const subIssues = [];
+            
+              console.log('🔄 Creating sub-issues using GITHUB_TOKEN (prevents workflow triggers)...');
+            
+              const baseLabels = ['sub-issue', `parent:${issue.number}`];
+            
+              // 1. Security Assessment Sub-Issue
+              const securityIssue = await github.rest.issues.create({
+                owner, repo,
+                title: `Security Assessment of: ${issue.title}`,
+                body: `🔗 **Parent Issue:** #${issue.number} - ${issue.title}
+            
+            ## Security Checklist
+            Please review and check applicable items:
+            
+            - [ ] Potential SQL injection vulnerability
+            - [ ] Cross-Site Scripting (XSS) risk  
+            - [ ] Access control/authorization issue
+            - [ ] Other security implications (explain below)
+            
+            ### Add comments below about any security findings and concerns. Close this sub issue when done`,
+                labels: [...baseLabels, 'security-assessment']
+              });
+            
+              subIssues.push(securityIssue.data);
+              console.log(`✅ Created security assessment sub-issue: #${securityIssue.data.number}`);
+            
+              // 2. Internal Testing Sub-Issue  
+              const internalTestingIssue = await github.rest.issues.create({
+                owner, repo,
+                title: `Internal Test Report of: ${issue.title}`,
+                body: `🔗 **Parent Issue:** #${issue.number} - ${issue.title}
+            
+            ### Add comments below about internal test results and findings and close this subissue when done.`,
+                labels: [...baseLabels, 'internal-testing']
+              });
+              subIssues.push(internalTestingIssue.data);
+              console.log(`✅ Created internal testing sub-issue: #${internalTestingIssue.data.number}`);
+            
+              // 3. Customer Testing Sub-Issue
+              const customerTestingIssue = await github.rest.issues.create({
+                owner, repo,
+                title: `Customer Test Report of: ${issue.title}`,
+                body: `🔗 **Parent Issue:** #${issue.number} - ${issue.title}
+            ### Add comments below about customer test results and findings and close this subissue when done.`,
+                labels: [...baseLabels, 'customer-testing']
+              });
+              subIssues.push(customerTestingIssue.data);
+              console.log(`✅ Created customer testing sub-issue: #${customerTestingIssue.data.number}`);
+            
+              // Link sub-issues back to parent with improved formatting
+              if (subIssues.length > 0) {
+                const subIssueLinks = subIssues
+                  .map(subIssue => `### #${subIssue.number} - ${subIssue.title}\n`)
+                  .join('\n');
+            
+                await github.rest.issues.createComment({
+                  owner, repo, issue_number: issue.number,
+                  body: `## Sub-Issues: 
+            
+            ${subIssueLinks}`
+                });
+              }
+              return subIssues;
+            }
+            
+            /**
+             * Creates user-friendly message for invalid template structure
+             */
+            function createMissingTemplateMessage(author, owner, repo) {
+              return `🚨 **@${author} - Issue Missing Template Structure**
+            
+            This issue appears to be missing proper template formatting.
+            
+            **Recommended Actions:**
+            1. Edit this issue to follow the template structure, or
+            2. Close and recreate using: https://github.com/${owner}/${repo}/issues/new/choose
+            
+            **Missing template sections may include:**
+            - Description
+            - Acceptance Criteria (for features)
+            - Expected Behavior (for bugs)  
+            - How to reproduce (for bugs)
+            - Priority selection
+            
+            **Need help?** Check our contributing guidelines or contact the development team.`;
+            }
+            
+            /**
+             * Creates user notification message for processing failures
+             */
+            function createProcessingFailedMessage(author, errorMessage) {
+              return `⚠️ **@${author} - Issue Processing Failed**
+            
+            There was an error processing your issue template. The issue has been created but some automation may not have completed.
+            
+            **Error:** ${errorMessage}
+            
+            **Manual actions needed:**
+            - Verify project fields are set correctly
+            - Check if sub-issues were created
+            - Contact the development team if problems persist
+            
+            **Issue Details:** This will be investigated by the team.`;
+            }
+            
+            // Execute the main function
+            await processIssue({ github, context, core });
