@@ -1,0 +1,37 @@
+name: Feature Request
+description: Request a new feature or enhancement
+labels: [feature]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: Describe the proposed feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: |
+       What tests should be satisfied for an acceptable implementation?
+       
+       Concrete examples are VERY helpful for early testing during implementation!
+    validations:
+      required: false
+  
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - Not Decided
+        - Low
+        - Medium
+        - High
+        - Critical
+      default: 0
+    validations:
+      required: false

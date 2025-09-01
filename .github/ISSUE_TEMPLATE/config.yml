@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🆕 Click here to see the WIKI guide on creating new feature requests.
+    url: https://github.com/AMI-Global/AMI.Docs/wiki/How%20to%20create%20a%20new%20feature%20request
+    about: Ask Stig, Ronen or Mikkel for any clarifications needed.
+  - name: 🐛 Click here to see the WIKI guide on creating new bug reports.
+    url: https://github.com/AMI-Global/AMI.Docs/wiki/How%20to%20create%20a%20new%20bug%20report
+    about: Ask Stig, Ronen or Mikkel for any clarifications needed.
